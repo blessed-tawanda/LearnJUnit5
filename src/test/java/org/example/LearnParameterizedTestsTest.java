@@ -2,9 +2,7 @@ package org.example;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.*;
 
 import java.util.stream.Stream;
 
@@ -52,7 +50,7 @@ public class LearnParameterizedTestsTest {
 
     /**
      * @MethodSource its like @ValueSource but now the values are from a static
-     * method which will be referenced as the MethodSource value the static method must return a Stream of data
+     * method which will be referenced as the @MethodSource value the static method must return a Stream of data
      * as shown below it can be a stream of any class type
      * @param dob
      */
@@ -62,6 +60,10 @@ public class LearnParameterizedTestsTest {
         Assertions.assertEquals(3, dob.split("-").length);
     }
 
+    /**
+     * The Source Method.
+     * @return
+     */
     static Stream<String> dobs() {
         Stream.Builder<String> builder = Stream.builder();
         int j = 0;
@@ -72,6 +74,37 @@ public class LearnParameterizedTestsTest {
             j +=1;
         }
         return builder.build();
+    }
+
+
+    @ParameterizedTest
+    @CsvSource({
+            "Zambezi,4,beer",
+            "Black Label,5,beer",
+            "Two Keys,45,liquor",
+            "Southern Comfort,18,liquor"
+    })
+    public void testIsLiquorFunction(String beverage, int alcoholContent, String alcoholType) {
+        System.out.println(beverage + ": " + alcoholContent + "%");
+        boolean expected = alcoholType.equals("liquor");
+        Assertions.assertEquals(expected, isLiquor(alcoholContent));
+    }
+
+    @ParameterizedTest
+    @CsvFileSource(files = "src/main/resources/drinks.csv")
+    public void testIsBeerFunction(String beverage, int alcoholContent, String alcoholType) {
+        System.out.println(beverage + ": " + alcoholContent + "%");
+        boolean expected = alcoholType.equals("beer");
+        Assertions.assertEquals(expected, isBeer(alcoholContent));
+    }
+
+
+    public boolean isLiquor(int alcoholContent) {
+        return alcoholContent > 10;
+    }
+
+    public boolean isBeer(int alcoholContent) {
+        return alcoholContent <= 10;
     }
     
 
